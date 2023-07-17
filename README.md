@@ -12,6 +12,8 @@
 
 蓝色线表示有外键约束
 
+使用PostgreSQL数据库
+
 - users 存储用户的各种信息,每个用户可以创建多个账号(account),一个账号对应一个币种
 - verify_emails 存储创建用户时验证邮件的各种信息
 - sessions 存储登录用户时的各种信息,比如刷新令牌(refresh token)
@@ -71,7 +73,9 @@
 
 使用事务,避免数据库创建用户成功但Redis处理失败,导致下一次无法创建用户(重复)的问题
 
-### 打包
+### 运行
 
-配置好docker-compose,二进制文件与postgres一起组成容器
+可以在配置好各种环境后,运行`make server`命令来启动程序
 
+本项目也配置好了docker-compose,其二进制文件与postgres一起组成容器
+只需要运行`docker-compose up`即可
