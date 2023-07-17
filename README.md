@@ -43,7 +43,7 @@
 
 也可以使用grpc网关代替`Gin`
 
-#### GPRC
+#### GRPC
 
 定义proto文件后,使用`protoc`生成对应go代码,搭建grpc服务器
 
