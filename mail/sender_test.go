@@ -12,10 +12,10 @@ func TestSendEmailWithGmail(t *testing.T) {
 		t.Skip()
 	}
 
-	config, err := util.LoadConfig("..")
+	config, privateConfig, err := util.LoadConfig("..")
 	require.NoError(t, err)
 
-	sender := NewGmailSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
+	sender := NewEmailConfig(config.EmailSenderName, privateConfig.EmailSenderAddress, privateConfig.EmailSenderPassword)
 
 	subject := "Test send email with gmail"
 	content := `

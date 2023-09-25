@@ -32,7 +32,7 @@ import (
 )
 
 func main() {
-	config, err := util.LoadConfig(".")
+	config, privateConfig, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot load config")
 	}
@@ -55,7 +55,7 @@ func main() {
 	}
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
 
-	go runTaskProcessor(config, redisOpt, store)
+	go runTaskProcessor(config, privateConfig, redisOpt, store)
 	go runGatewayServer(config, store, taskDistributor)
 	runGrpcServer(config, store, taskDistributor)
 }
@@ -71,8 +71,8 @@ func runDBMigrations(migrationURL string, dbSource string) {
 	}
 }
 
-func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store db.Store) {
-	mailer := mail.NewGmailSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
+func runTaskProcessor(config util.Config, privateConfig util.PrivateConfig, redisOpt asynq.RedisClientOpt, store db.Store) {
+	mailer := mail.NewEmailConfig(config.EmailSenderName, privateConfig.EmailSenderAddress, privateConfig.EmailSenderPassword)
 	processor := worker.NewTaskProcessor(redisOpt, store, mailer)
 	err := processor.Start()
 	if err != nil {

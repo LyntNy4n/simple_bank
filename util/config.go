@@ -18,13 +18,17 @@ type Config struct {
 	RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 	RedisAddress         string        `mapstructure:"REDIS_ADDRESS"`
 	EmailSenderName      string        `mapstructure:"EMAIL_SENDER_NAME"`
-	EmailSenderAddress   string        `mapstructure:"EMAIL_SENDER_ADDRESS"`
-	EmailSenderPassword  string        `mapstructure:"EMAIL_SENDER_PASSWORD"`
 }
 
-func LoadConfig(path string) (config Config, err error) {
+type PrivateConfig struct {
+	EmailSenderAddress  string `mapstructure:"EMAIL_SENDER_ADDRESS"`
+	EmailSenderPassword string `mapstructure:"EMAIL_SENDER_PASSWORD"`
+}
+
+func LoadConfig(path string) (config Config, privateConfig PrivateConfig, err error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
+
 	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
@@ -35,6 +39,18 @@ func LoadConfig(path string) (config Config, err error) {
 	}
 
 	err = viper.Unmarshal(&config)
+	if err != nil {
+		return
+	}
+
+	viper.SetConfigName("private")
+	viper.AutomaticEnv()
+	err = viper.ReadInConfig()
+	if err != nil {
+		return
+	}
+
+	err = viper.Unmarshal(&privateConfig)
 	if err != nil {
 		return
 	}

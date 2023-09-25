@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/smtp"
 
@@ -8,8 +9,8 @@ import (
 )
 
 const (
-	smtpAuthAddress   = "smtp.gmail.com"
-	smtpServerAddress = "smtp.gmail.com:587"
+	smtpAuthAddress   = "smtp.qq.com"
+	smtpServerAddress = "smtp.qq.com:465"
 )
 
 type EmailSender interface {
@@ -23,21 +24,21 @@ type EmailSender interface {
 	) error
 }
 
-type GmailSender struct {
+type EmailConfig struct {
 	name              string
 	fromEmailAddress  string
 	fromEmailPassword string
 }
 
-func NewGmailSender(name string, fromEmailAddress string, fromEmailPassword string) EmailSender {
-	return &GmailSender{
+func NewEmailConfig(name string, fromEmailAddress string, fromEmailPassword string) EmailSender {
+	return &EmailConfig{
 		name:              name,
 		fromEmailAddress:  fromEmailAddress,
 		fromEmailPassword: fromEmailPassword,
 	}
 }
 
-func (sender *GmailSender) SendEmail(
+func (sender *EmailConfig) SendEmail(
 	subject string,
 	content string,
 	to []string,
@@ -61,5 +62,12 @@ func (sender *GmailSender) SendEmail(
 	}
 
 	smtpAuth := smtp.PlainAuth("", sender.fromEmailAddress, sender.fromEmailPassword, smtpAuthAddress)
-	return e.Send(smtpServerAddress, smtpAuth)
+	//send with ssl
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: true,
+		ServerName:         smtpAuthAddress,
+	}
+	return e.SendWithTLS(smtpServerAddress, smtpAuth, tlsConfig)
+
+	// return e.Send(smtpServerAddress, smtpAuth)
 }
